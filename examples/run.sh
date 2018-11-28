@@ -9,7 +9,7 @@ echo $PIDFILE
 case "$1" in
     start)
         echo $$ > $PIDFILE;
-        exec 2>&1 $RUN 1>/tmp/$CWD.out;
+        exec 2>&1 $RUN &>/tmp/$CWD.out;
         ;;
     stop)
         if [ -e $PIDFILE ] ; then
