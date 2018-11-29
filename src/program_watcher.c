@@ -55,19 +55,21 @@ bool is_running(watched_runner_t * runner)
 void update_watched_runners (watched_runner_t** runners, char ** directories)
 {
     int index = 0;
-    
+    watched_runner_t * runner;
     while (directories[index] != NULL)
     {
-        watched_runner_t * runner = malloc(sizeof(watched_runner_t));
+        runner = malloc(sizeof(watched_runner_t));
         runner->program_name = strdup(rindex(directories[index], '/')+sizeof(char));
         runner->path = strcat(strdup(directories[index]), "/run.sh");
+        runner->pid = 0;
+        runner->restart_count = 0;
         if(add_runner(runners, runner) != 0)
         {
             free(runner);
             index++;
             continue;
         }
-        spawn(runner);
+        /*spawn(runner);*/
         index++;
     }
 }
@@ -75,8 +77,10 @@ void update_watched_runners (watched_runner_t** runners, char ** directories)
 int add_runner(watched_runner_t** runners, watched_runner_t * runner)
 {
     int index = 0;
+    // if(runners == NULL)
+    //     runners = malloc(sizeof(watched_runner_t*)*0);
     /* Check if exists */
-    while(runners[index] != NULL)
+    while(runners != NULL && runners[index] != NULL)
     {
         if(runners[index]->program_name == runner->program_name)
         {
@@ -85,7 +89,8 @@ int add_runner(watched_runner_t** runners, watched_runner_t * runner)
         index++;
     }
 
-    runners = realloc(runners, sizeof(watched_runner_t*)*index);
+    runners = realloc(runners, sizeof(watched_runner_t*)*(index > 0 ? index : 1));
+    
     runners[index] = runner;
     return 0;
 }

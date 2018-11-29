@@ -45,7 +45,7 @@ int main(int argc, char ** argv)
 
     printf("Fleetech Supvisor watching folder '%s'.\n", directory);
 
-    watched_runner_t ** runners = malloc(sizeof(watched_runner_t*)*0);
+    watched_runner_t ** runners = malloc(sizeof(watched_runner_t*));
     while (TRUE) {
         char ** response = get_directories_with_runsh(directory);
         update_watched_runners(runners, response);

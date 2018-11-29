@@ -1,7 +1,7 @@
-CC = arm-linux-gnueabihf-gcc
-LD = arm-linux-gnueabihf-ld
+CC = gcc
+LD = ld
 
-INCLUDES = -I/usr/arm-linux-gnueabihf/include -I/usr/lib/gcc-cross/arm-linux-gnueabihf/7/include
+INCLUDES = -I/usr/include
 CFLAGS = -g -Wall
 LDFLAGS =
 
