@@ -1,36 +1,65 @@
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <getopt.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <string.h>
 
-int main(int argc, char ** args)
+#include "directory_watcher.h"
+#include "program_watcher.h"
+
+int main(int argc, char ** argv)
 {
-    printf("Hello world.\n");
+    if(argc < 1)
+        exit(-1);
 
-    pid_t pid = fork();
+    static struct option long_options[] = {
+        {"directory", required_argument, 0, 0},
+        {0,0,0,0}
+    };
 
-    if(pid == 0)
+    char * directory;    
+    int opt;
+    int option_index = 0;
+    while((opt = getopt_long_only(argc, argv, "", long_options, &option_index)) != -1)
     {
-        char * exe = "/bin/ls";
-        char * arg[] = { "/bin/ls", "-la", NULL};
-        int exec_result = execvp(exe, arg);
-        if(exec_result != 0)
+        switch(opt)
         {
-            perror("execvp");
-            return -1;
+            case 'd':
+            case 0:
+                printf("Option %s with arg %s\n", long_options[option_index].name, optarg);
+                directory = malloc(sizeof(char)*strlen(optarg)+1);
+                strcpy(directory, optarg);
+                break;
+            default:
+                printf("Usage %s --directory <dir>\n", argv[0]);
         }
-        return 0;
     }
 
-    int wstatus;
-    int result = waitpid(pid, &wstatus, 0);
-
-    if(result == pid)
+    if(directory == NULL)
     {
-        printf("Successfully called 'ls'\n");
+        printf("Usage %s --directory <dir>\n", argv[0]);
     }
-    else{
-        printf ("This succs\n");
+
+    printf("Fleetech Supvisor watching folder '%s'.\n", directory);
+
+    watched_runner_t ** runners = malloc(sizeof(watched_runner_t*)*0);
+    while (TRUE) {
+        char ** response = get_directories_with_runsh(directory);
+        update_watched_runners(runners, response);
+
+        free_all(response);
+        
+        int index = 0;
+        while(response[index] != NULL)
+        {
+            printf("Folder %d -> %s\n", index, response[index]);
+            index++;
+        }
+
+        sleep(5000);
     }
+    return 0;
 }
