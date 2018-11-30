@@ -12,6 +12,11 @@
 #include "directory_watcher.h"
 #include "program_watcher.h"
 
+/*
+    TODO: Should call stop on run.sh when trying to restart a process.
+            To ensure things are cleaned up according to script.
+*/
+
 watched_runner_t ** runners;
 
 bool is_dir(char* name);
@@ -103,6 +108,6 @@ void handler(int sig, siginfo_t *info, void *ucontext)
         free_all_runners(runners);
     }
 
-exit(0);
+    exit(0);
     // stop_all(runners);
 }
