@@ -11,6 +11,8 @@ const bool FALSE = 0;
 const bool TRUE = 1;
 
 /* Declare internal methods */
+pid_t spawn(watched_runner_t * runner);
+bool is_running(watched_runner_t * runner);
 int add_runner(watched_runner_t** runners, watched_runner_t * runner);
 void free_runner(watched_runner_t * runner);
 watched_runner_t * get_runner(watched_runner_t ** runners, char * name);
@@ -48,19 +50,49 @@ pid_t spawn(watched_runner_t* runner)
 }
 
 
+void stop(watched_runner_t* runner)
+{
+    int length = strlen(runner->path)-7;
+    char dir[length];
+    strncpy(dir, runner->path, length);
+    chdir(dir);
+
+    char * cmd = strdup(runner->path);
+    cmd = realloc(cmd,strlen(cmd) + 5);
+    cmd = strcat(cmd, " stop");
+    if(system(cmd)){
+        perror("Failed to execute");
+    }
+    free(cmd);
+}
+
+void stop_all(watched_runner_t ** runners)
+{
+    int index=0;
+    while(runners != NULL && runners[index] != NULL)
+    {
+        stop(runners[index]);
+        index++;
+    }
+}
+
 bool is_running(watched_runner_t * runner)
 {
     int wstatus;
-    int result = waitpid(runner->pid, &wstatus, 0);
+    int result;
+
+    if(runner->pid == 0)
+        return FALSE;
+
+    result = waitpid(runner->pid, &wstatus, WNOHANG);
+    if (result == 0){
+        return TRUE;
+    }
 
     if(result == runner->pid)
     {
         printf("Watched program %s has stopped.\n", runner->program_name);
         return FALSE;
-    }
-    else if (result == 0){
-        printf ("Watched program %s is still running.\n", runner->program_name);
-        return TRUE;
     }
 
     return FALSE;
@@ -111,6 +143,15 @@ watched_runner_t * get_runner(watched_runner_t ** runners, char * name)
     return NULL;
 }
 
+void free_all_runners(watched_runner_t** runners)
+{
+    int index = 0;
+    while(runners!= NULL && runners[index] != NULL)
+    {
+        free_runner(runners[index]);
+        index++;
+    }
+}
 void free_runner(watched_runner_t * runner)
 {
     free(runner->program_name);
@@ -121,8 +162,6 @@ void free_runner(watched_runner_t * runner)
 int add_runner(watched_runner_t** runners, watched_runner_t * runner)
 {
     int index = 0;
-    // if(runners == NULL)
-    //     runners = malloc(sizeof(watched_runner_t*)*0);
     /* Check if exists */
     while(runners != NULL && runners[index] != NULL)
     {

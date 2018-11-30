@@ -16,9 +16,10 @@ char** get_directories_with_runsh(char* parent)
     if(dir == NULL)
     {
         printf("Could not open folder '%s'.\n", parent);
+        return NULL;
     }
     
-    int parent_length = strlen(parent)+1;
+    int parent_length = strlen(parent);
     while((de = readdir(dir)) != NULL)
     {
         if(de->d_type != DT_DIR)
@@ -27,7 +28,7 @@ char** get_directories_with_runsh(char* parent)
             continue;
 
         /* Build path to run.sh script */
-        int length = parent_length + strlen(de->d_name);
+        int length = parent_length + 1 + strlen(de->d_name);
         char * path = malloc(sizeof(char)*length);
         strcpy(path,parent);
         strcat(path,"/");
@@ -41,7 +42,6 @@ char** get_directories_with_runsh(char* parent)
         /* Clean up temporary path */
         free(filepath);
 
-        printf ("Adding folder: '%s'\n", path);
         response = realloc(response, (directory_count + 1) * sizeof(char*));
         response[directory_count] = path;
         directory_count += 1;

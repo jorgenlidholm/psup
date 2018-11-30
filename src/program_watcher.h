@@ -10,10 +10,10 @@
         char * program_name;
         char * path;
         int restart_count;
+        bool dont_run;
     } watched_runner_t;
 
-    pid_t spawn(watched_runner_t * runner);
-    bool is_running(watched_runner_t * runner);
     void update_watched_runners (watched_runner_t** runners, char ** directories);
-    
+    void free_all_runners(watched_runner_t** runners);
+    void stop_all(watched_runner_t** runners);
 #endif /* PROGRAM_RUNNER_H */
