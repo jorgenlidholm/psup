@@ -2,7 +2,7 @@ CC = gcc
 LD = ld
 
 INCLUDES = -I/usr/include
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -O0
 LDFLAGS =
 
 dir_guard=@mkdir -p $(@D)
