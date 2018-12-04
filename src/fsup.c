@@ -12,13 +12,7 @@
 #include "directory_watcher.h"
 #include "program_watcher.h"
 
-/*
-    TODO: Should call stop on run.sh when trying to restart a process.
-            To ensure things are cleaned up according to script.
-*/
-
 watched_runner_t ** runners;
-
 bool is_dir(char* name);
 void send_sigint_to_instance(char* directory);
 void handler(int sig, siginfo_t *info, void *ucontext);
@@ -31,6 +25,7 @@ void print_usage(char * name)
 int main(int argc, char ** argv)
 {
     struct sigaction act;
+
     bool stop_all_watched_applications = FALSE;
     printf ("### Fleetech Supervisor ###\n\n");
     if(argc < 1)
@@ -113,14 +108,18 @@ bool is_dir(char* name)
 
 void handler(int sig, siginfo_t *info, void *ucontext)
 {
-    if (sig == SIGINT)
+    switch(sig)
     {
-        stop_all(runners);
-        free_all_runners(runners);
+        case SIGINT:
+        case SIGKILL:
+            stop_all(runners);
+            free_all_runners(runners);
+            exit(0);
+            break;
+        case SIGHUP:
+            printf("Whats HUP.\n");
+            break;
     }
-
-    exit(0);
-    // stop_all(runners);
 }
 
 void send_sigint_to_instance(char* directory)
