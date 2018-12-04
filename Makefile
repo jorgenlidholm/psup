@@ -22,7 +22,7 @@ CHEAD = src/*.h
 all: $(EXE) $(CSRC) $(OBJ)
 
 clean:
-	rm -rf build *.o *~ core
+	rm -rf build *.o *~ core arm/${FILE}
 
 $(EXE): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) $(LDFLAGS) -o $@ 

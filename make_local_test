@@ -11,7 +11,10 @@ outputfolder=build_$(shell arch)
 EXE = $(outputfolder)/fsup
 FOLDERS=$(outputfolder) 
 
-OBJ = ${EXE}.o $(outputfolder)/directory_watcher.o $(outputfolder)/program_watcher.o $(outputfolder)/process_helper.o
+OBJ = ${EXE}.o \
+	$(outputfolder)/directory_watcher.o \
+	$(outputfolder)/program_watcher.o \
+	$(outputfolder)/process_helper.o
 CSRC = src/*.c
 CHEAD = src/*.h
 
