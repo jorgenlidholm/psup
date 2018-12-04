@@ -7,11 +7,11 @@ LDFLAGS =
 
 dir_guard=@mkdir -p $(@D)
 
-outputfolder=build
+outputfolder=build_armhf
 EXE = $(outputfolder)/fsup
 FOLDERS=$(outputfolder) 
 
-OBJ = ${EXE}.o build/directory_watcher.o build/program_watcher.o
+OBJ = ${EXE}.o $(outputfolder)/directory_watcher.o $(outputfolder)/program_watcher.o
 CSRC = src/*.c
 CHEAD = src/*.h
 
@@ -23,15 +23,15 @@ clean:
 $(EXE): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) $(LDFLAGS) -o $@ 
 
-build/program_watcher.o: src/program_watcher.c
+$(outputfolder)/program_watcher.o: src/program_watcher.c
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-build/directory_watcher.o: src/directory_watcher.c
+$(outputfolder)/directory_watcher.o: src/directory_watcher.c
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-build/fsup.o: src/fsup.c
+$(outputfolder)/fsup.o: src/fsup.c
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 

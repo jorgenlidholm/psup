@@ -20,6 +20,7 @@
 watched_runner_t ** runners;
 
 bool is_dir(char* name);
+void send_sigint_to_instance(char* directory);
 void handler(int sig, siginfo_t *info, void *ucontext);
 
 void print_usage(char * name)
@@ -30,6 +31,7 @@ void print_usage(char * name)
 int main(int argc, char ** argv)
 {
     struct sigaction act;
+    bool stop_all_watched_applications = FALSE;
     printf ("### Fleetech Supervisor ###\n\n");
     if(argc < 1)
     {
@@ -55,6 +57,9 @@ int main(int argc, char ** argv)
                 directory = malloc(sizeof(char)*strlen(optarg)+1);
                 strcpy(directory, optarg);
                 break;
+            case 1:
+                stop_all_watched_applications = TRUE;
+                break;
             default:
                 print_usage(argv[0]);
         }
@@ -67,9 +72,13 @@ int main(int argc, char ** argv)
         exit (-1);
     }
 
-    /* Sätt upp skydd mot Ctrl-C */
+    if(stop_all_watched_applications)
+    {
+         /* Försök hitta fsup som övervakar <directory> */
+        send_sigint_to_instance(directory);
+    }
 
-    
+    /* Sätt upp hantering mot Ctrl-C (SIGINT) */
     memset (&act, '\0', sizeof(act));
     act.sa_handler = (void*)&handler;
     sigaction(SIGINT, &act, NULL);
@@ -78,12 +87,14 @@ int main(int argc, char ** argv)
 
     printf("Watching folder '%s'.\n", directory);
 
-    runners = malloc(sizeof(watched_runner_t*));
-    *runners = NULL;
+    runners = NULL;
+    // malloc(sizeof(watched_runner_t**));
+    // *runners = NULL;
     while (TRUE) {
         char ** response = get_directories_with_runsh(directory);
-        update_watched_runners(runners, response);
+        runners = update_watched_runners(runners, response);
         free_all(response);
+
         sleep(5);
     }
     return 0;
@@ -92,7 +103,7 @@ int main(int argc, char ** argv)
 bool is_dir(char* name)
 {
     DIR * dir;
-    if((dir = opendir(name)) == NULL)
+    if(name == NULL || (dir = opendir(name)) == NULL)
     {
         return FALSE;
     }
@@ -110,4 +121,10 @@ void handler(int sig, siginfo_t *info, void *ucontext)
 
     exit(0);
     // stop_all(runners);
+}
+
+void send_sigint_to_instance(char* directory)
+{
+    // pid_t pid;
+    
 }

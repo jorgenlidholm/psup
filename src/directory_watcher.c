@@ -7,7 +7,7 @@
 
 char** get_directories_with_runsh(char* parent)
 {
-    char ** response = malloc(0);
+    char ** response = malloc(sizeof(char**));
     // int total_length = 0;
     int directory_count = 0;
 
@@ -28,12 +28,12 @@ char** get_directories_with_runsh(char* parent)
             continue;
 
         /* Build path to run.sh script */
-        int length = parent_length + 1 + strlen(de->d_name);
-        char * path = malloc(sizeof(char)*length);
+        int length = parent_length + 1 + strlen(de->d_name) + 1;
+        char * path = calloc(sizeof(char), length);
         strcpy(path,parent);
         strcat(path,"/");
         strcat(path,de->d_name);
-        char * filepath = malloc(sizeof(char*)*(length+7));
+        char * filepath = calloc(sizeof(char), length + 7 + 1);
         strcpy(filepath, path);
         strcat(filepath, "/run.sh");
         
@@ -48,7 +48,10 @@ char** get_directories_with_runsh(char* parent)
     }
     closedir(dir);
     /* NULL terminate */
-    response = realloc(response, (directory_count+1) * sizeof(char*));
+    void* p = realloc(response, (directory_count+1) * sizeof(char*));
+    if(p == NULL)
+        return p;
+    response = p;
     response[directory_count] = NULL;
     return response;
 }

@@ -11,9 +11,10 @@
         char * path;
         int restart_count;
         bool dont_run;
+        time_t file_time;
     } watched_runner_t;
 
-    void update_watched_runners (watched_runner_t** runners, char ** directories);
+    watched_runner_t** update_watched_runners (watched_runner_t** runners, char ** directories);
     void free_all_runners(watched_runner_t** runners);
     void stop_all(watched_runner_t** runners);
 #endif /* PROGRAM_RUNNER_H */
