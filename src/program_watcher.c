@@ -28,24 +28,16 @@ const char * dirptr = dir;
 
 pid_t spawn(watched_runner_t* runner)
 {
-    // fflush(stdout);
 
     /* Child process. */
     int length = strlen(runner->path)-7;
-    // char dir;
-    // dir = calloc(sizeof(char), length);
     strncpy(dir, runner->path, length+1);
     
     pid_t pid = fork();
 
     if(pid == 0)
     {
-        
         /* Child process. */
-        // int length = strlen(runner->path)-7;
-        // char * dir;
-        // dir = calloc(sizeof(char), length);
-        // strncpy(dir, runner->path, length);
 
         if(chdir(dirptr) == -1)
         {
@@ -65,7 +57,6 @@ pid_t spawn(watched_runner_t* runner)
         runner->file_time = get_file_time(runner->path);
         runner->pid = pid;
     }
-    // free(dir);
     
     return pid;
 }
@@ -77,7 +68,6 @@ void stop(watched_runner_t* runner)
     char * dir = calloc(sizeof(char), length+2);
     strncpy(dir, runner->path, length);
     dir[length+1] = '\0';
-    printf("Changing to '%s'\n", dir);
     if(chdir(dir) == -1)
     {
         free(dir);

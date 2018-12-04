@@ -11,7 +11,7 @@ outputfolder=build_$(shell arch)
 EXE = $(outputfolder)/fsup
 FOLDERS=$(outputfolder) 
 
-OBJ = ${EXE}.o $(outputfolder)/directory_watcher.o $(outputfolder)/program_watcher.o
+OBJ = ${EXE}.o $(outputfolder)/directory_watcher.o $(outputfolder)/program_watcher.o $(outputfolder)/process_helper.o
 CSRC = src/*.c
 CHEAD = src/*.h
 
@@ -28,6 +28,10 @@ $(outputfolder)/program_watcher.o: src/program_watcher.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 $(outputfolder)/directory_watcher.o: src/directory_watcher.c
+	$(dir_guard)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+$(outputfolder)/process_helper.o: src/process_helper.c src/process_helper.h
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 

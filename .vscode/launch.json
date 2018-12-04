@@ -4,13 +4,16 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
-        { 
-            "name": "(gdb) Attach",
+        {
+            "name": "(gdb) Stop",
             "type": "cppdbg",
-            "request": "attach",
-            "program": "${workspaceFolder}/build/fsup",
-            "processId": "${command:pickProcess}",
+            "request": "launch",
+            "program": "${workspaceFolder}/build_x86_64/fsup",
+            "args": ["--stop"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -21,10 +24,10 @@
             ]
         },
         {
-            "name": "(gdb) Launch",
+            "name": "(gdb) Start",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/fsup",
+            "program": "${workspaceFolder}/build_x86_64/fsup",
             "args": ["--directory","~/test"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -35,8 +38,7 @@
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
-                    "ignoreFailures": true,
-                    "follow-fork-mode": true
+                    "ignoreFailures": true
                 }
             ]
         }

@@ -8,9 +8,12 @@
 #include <string.h>
 #include <dirent.h>
 #include <signal.h>
+#define _GNU_SOURCE
+#include <errno.h>
 
 #include "directory_watcher.h"
 #include "program_watcher.h"
+#include "process_helper.h"
 
 watched_runner_t ** runners;
 bool is_dir(char* name);
@@ -22,11 +25,14 @@ void print_usage(char * name)
     printf("Usage %s --directory <dir>\n", name);
 }
 
+extern char *program_invocation_name;
+extern char *program_invocation_short_name;
+
 int main(int argc, char ** argv)
 {
     struct sigaction act;
-
     bool stop_all_watched_applications = FALSE;
+
     printf ("### Fleetech Supervisor ###\n\n");
     if(argc < 1)
     {
@@ -37,6 +43,7 @@ int main(int argc, char ** argv)
 
     static struct option long_options[] = {
         {"directory", required_argument, 0, 0},
+        {"stop", no_argument, 0, 1 },
         {0,0,0,0}
     };
 
@@ -52,6 +59,7 @@ int main(int argc, char ** argv)
                 directory = malloc(sizeof(char)*strlen(optarg)+1);
                 strcpy(directory, optarg);
                 break;
+            case 's':
             case 1:
                 stop_all_watched_applications = TRUE;
                 break;
@@ -60,17 +68,19 @@ int main(int argc, char ** argv)
         }
     }
 
-    if(!is_dir(directory))
-    {
-        printf("%s is not a valid directory, or you don't have access.\n", directory);
-        print_usage(argv[0]);
-        exit (-1);
-    }
 
     if(stop_all_watched_applications)
     {
          /* Försök hitta fsup som övervakar <directory> */
         send_sigint_to_instance(directory);
+        exit(0);
+    }
+
+    if(!is_dir(directory))
+    {
+        printf("%s is not a valid directory, or you don't have access.\n", directory);
+        print_usage(argv[0]);
+        exit (-1);
     }
 
     /* Sätt upp hantering mot Ctrl-C (SIGINT) */
@@ -111,6 +121,7 @@ void handler(int sig, siginfo_t *info, void *ucontext)
     switch(sig)
     {
         case SIGINT:
+            printf("Received SIGINT, stopping...\n");
             stop_all(runners);
             free_all_runners(runners);
             exit(0);
@@ -123,6 +134,22 @@ void handler(int sig, siginfo_t *info, void *ucontext)
 
 void send_sigint_to_instance(char* directory)
 {
-    // pid_t pid;
+    pid_t * pids;
+    pid_t my_pid = getpid();
     
+    pids = pidsof(program_invocation_short_name);
+
+    int index =0;
+    while (pids[index] != -1)
+    {
+        if(pids[index] == my_pid){
+            index++;
+            continue;
+        }
+        
+        printf("Sending SIGINT to process %s with pid %d.\n", program_invocation_short_name, pids[index]);
+        kill(pids[index], SIGINT);
+        index++;
+    }
+    free(pids);
 }
