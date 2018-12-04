@@ -111,7 +111,6 @@ void handler(int sig, siginfo_t *info, void *ucontext)
     switch(sig)
     {
         case SIGINT:
-        case SIGKILL:
             stop_all(runners);
             free_all_runners(runners);
             exit(0);
