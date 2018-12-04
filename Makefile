@@ -8,10 +8,14 @@ LDFLAGS =
 dir_guard=@mkdir -p $(@D)
 
 outputfolder=build_armhf
-EXE = $(outputfolder)/fsup
+FILE = fsup
+EXE = $(outputfolder)/${FILE}
 FOLDERS=$(outputfolder) 
 
-OBJ = ${EXE}.o $(outputfolder)/directory_watcher.o $(outputfolder)/program_watcher.o
+OBJ = ${EXE}.o \
+	$(outputfolder)/directory_watcher.o \
+	$(outputfolder)/program_watcher.o \
+	$(outputfolder)/process_helper.o
 CSRC = src/*.c
 CHEAD = src/*.h
 
@@ -31,10 +35,18 @@ $(outputfolder)/directory_watcher.o: src/directory_watcher.c
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+$(outputfolder)/process_helper.o: src/process_helper.c src/process_helper.h
+	$(dir_guard)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
 $(outputfolder)/fsup.o: src/fsup.c
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+install: all
+	@mkdir -p arm
+	cp $(EXE) arm/${FILE}
+	
 push:
 	scp build/fsup root@192.168.2.159:~/
 

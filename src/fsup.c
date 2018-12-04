@@ -20,13 +20,17 @@ bool is_dir(char* name);
 void send_sigint_to_instance(char* directory);
 void handler(int sig, siginfo_t *info, void *ucontext);
 
-void print_usage(char * name)
-{
-    printf("Usage %s --directory <dir>\n", name);
-}
-
 extern char *program_invocation_name;
 extern char *program_invocation_short_name;
+
+void print_usage(char * name)
+{
+    printf("Usage %s [--directory <dir>] [--stop]\n\n", name);
+    printf ("\t-d --directory <dir> \tSpecify directory to watch.\n");
+    printf ("\t-s --stop \t\tStop all instances of '%s'.\n", program_invocation_short_name);
+    printf ("\t-h --help \t\tPrints this cruft.\n\n");
+}
+
 
 int main(int argc, char ** argv)
 {
@@ -44,6 +48,7 @@ int main(int argc, char ** argv)
     static struct option long_options[] = {
         {"directory", required_argument, 0, 0},
         {"stop", no_argument, 0, 1 },
+        {"help", no_argument, 0, 2 },
         {0,0,0,0}
     };
 
@@ -63,6 +68,10 @@ int main(int argc, char ** argv)
             case 1:
                 stop_all_watched_applications = TRUE;
                 break;
+            case 'h':
+            case 2:
+                print_usage(argv[0]);
+                return 0;
             default:
                 print_usage(argv[0]);
         }
@@ -78,7 +87,7 @@ int main(int argc, char ** argv)
 
     if(!is_dir(directory))
     {
-        printf("%s is not a valid directory, or you don't have access.\n", directory);
+        printf("%s is not a valid directory, or you don't have access.\n\n", directory);
         print_usage(argv[0]);
         exit (-1);
     }
