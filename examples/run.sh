@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RUN="mono OFLMachine.exe"
+RUN="myprogram"
 CWD=$(basename $PWD)
 PIDFILE=/var/run/$CWD.pid
 

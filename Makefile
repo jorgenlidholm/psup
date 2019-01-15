@@ -8,7 +8,7 @@ LDFLAGS =
 dir_guard=@mkdir -p $(@D)
 
 outputfolder=build_armhf
-FILE = fsup
+FILE = psup
 EXE = $(outputfolder)/${FILE}
 FOLDERS=$(outputfolder) 
 
@@ -39,7 +39,7 @@ $(outputfolder)/process_helper.o: src/process_helper.c src/process_helper.h
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-$(outputfolder)/fsup.o: src/fsup.c
+$(outputfolder)/psup.o: src/psup.c
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -47,7 +47,3 @@ install: all
 	@mkdir -p arm
 	cp $(EXE) arm/${FILE}
 	
-push:
-	scp build/fsup root@192.168.2.159:~/
-
-
