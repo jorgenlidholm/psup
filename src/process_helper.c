@@ -76,10 +76,10 @@ bool is_command_dir(char* dir, char * command)
     strcpy(filename, "/proc/");
     strcat(filename, dir);
     strcat(filename, "/comm");
+    // filename == "/proc/7331/comm"
     int fd = open(filename, O_RDONLY);
 
     ssize_t count = read(fd, cname, 1024);
-
     if(count > 0) {
         cname[count-1] = '\0';
         return !strcmp(command, cname);
